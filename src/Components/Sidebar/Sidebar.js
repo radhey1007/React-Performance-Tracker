@@ -13,8 +13,7 @@ const Sidebar = (props) => {
                 </NavLink>
                 <NavLink className='link' to="/student">
                   <SidebarLink text="Student" Icon={HomeIcon}/>
-                </NavLink>
-                
+                </NavLink>                
                 <SidebarLink text="Explore" Icon={SearchIcon} />
                 <SidebarLink text="Assignment"/>
                 <SidebarLink text="Batch" />

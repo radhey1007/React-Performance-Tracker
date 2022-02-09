@@ -47,6 +47,21 @@
   text-align: center;
 }
 
+.select {
+  flex: 3 1;
+  font: inherit;
+  padding: 0.35rem 0.35rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.error-text {
+  color: red;
+  font-size: 16px;
+  display: flex;
+  padding-left: 155px;
+}
+
 @media (min-width: 768px) {
   .control {
     align-items: center;

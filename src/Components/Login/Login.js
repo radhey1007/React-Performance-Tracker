@@ -1,96 +1,84 @@
-import React, { useState , useEffect } from 'react';
+import  { useState , useEffect } from 'react';
 
 import Card from '../../UI/Card/Card';
 import Button from '../../UI/Button/Button';
 import classes from './Login.module.css';
-
+import useInput from '../../hooks/use-input';
 
 const Login = (props) => {
-  const [enteredEmail, setEnteredEmail] = useState('');
-  const [emailIsValid, setEmailIsValid] = useState();
-  const [enteredPassword, setEnteredPassword] = useState('');
-  const [passwordIsValid, setPasswordIsValid] = useState();
   const [formIsValid, setFormIsValid] = useState(false);
 
+  const { value:enteredEmail, 
+    isValid:enteredEmailIsValid,
+    hasError: emailInputHasError,
+    valueChangeHandler:emailChangedHandler,
+    inputBlurHandler:emailBlurHandler,
+    reset:resetEmailInput
+  } = useInput(value => value.includes('@')); 
+
+  const { value:enteredPassword, 
+    isValid:enteredPasswordIsValid,
+    hasError: passwordInputHasError,
+    valueChangeHandler:passwordChangedHandler,
+    inputBlurHandler:passwordBlurHandler,
+    reset:resetPasswordInput
+  } = useInput(value => value!=='' && value.length > 3 && value.length < 8);
 
   useEffect(()=> {
-    // Here we are using the cleanup function to prevent the multiple,
-    // function call at the time of key change (Example like API Call)
-
     const identifier = setTimeout(()=> {
-      // console.log('check num of call in useEffect');
       setFormIsValid(
-        enteredEmail.includes('@') && enteredPassword.trim().length > 6
+        enteredEmailIsValid && enteredPasswordIsValid
       )
     },500);   
     return () => {
       // console.log('CLEAUP FUNCTION, For preventing the API CALL MULTIPLE TIME ');
       clearTimeout(clearTimeout);
     }    
-  },[enteredEmail,enteredPassword])
-
-  const emailChangeHandler = (event) => {
-    setEnteredEmail(event.target.value);   
-  };
-
-  const passwordChangeHandler = (event) => {
-    setEnteredPassword(event.target.value);
-  };
-
-  const validateEmailHandler = () => {
-    setEmailIsValid(enteredEmail.includes('@'));
-  };
-
-  const validatePasswordHandler = () => {
-    setPasswordIsValid(enteredPassword.trim().length > 6);
-  };
+  },[enteredEmailIsValid,enteredPasswordIsValid])
 
   const submitHandler = (event) => {
     event.preventDefault();
-    let userList = localStorage.getItem('userList') || [];
-    if(userList.length > 0) {
-      userList = JSON.parse(userList); 
-      const currentUser = userList.filter(user => user.email === enteredEmail);
-      if(currentUser && currentUser.length > 0){
-          props.onLogin('Admin');
-          console.log('Admin');
-      } else {
-          props.onLogin('Guest');
-          console.log('Guest User');
-      }
-    }    
+    let obj = {
+      email:enteredEmail,
+      password:enteredPassword
+    }
+    console.log(obj);       
   };
+
+  const emailInputClasses = emailInputHasError ? `${classes['control']} ${classes.invalid}` : `${classes['control']}`;
+  const passwordInputClasses = passwordInputHasError ? `${classes['control']} ${classes.invalid}` : `${classes['control']}`;
+
 
   return (
     <Card className={classes.login}>
       <form onSubmit={submitHandler}>
-        <div
-          className={`${classes.control} ${
-            emailIsValid === false ? classes.invalid : ''
-          }`}
-        >
+      <div>
+        <div className={emailInputClasses}>
           <label htmlFor="email">E-Mail</label>
           <input
             type="email"
             id="email"
             value={enteredEmail}
-            onChange={emailChangeHandler}
-            onBlur={validateEmailHandler}
+            onChange={emailChangedHandler}
+            onBlur={emailBlurHandler}
           />
         </div>
-        <div
-          className={`${classes.control} ${
-            passwordIsValid === false ? classes.invalid : ''
-          }`}
-        >
+        {emailInputHasError && 
+          <p className={classes['error-text']}>Please enter the email.</p>}
+        </div>
+        <div>
+        <div className={passwordInputClasses}>
           <label htmlFor="password">Password</label>
           <input
             type="password"
             id="password"
             value={enteredPassword}
-            onChange={passwordChangeHandler}
-            onBlur={validatePasswordHandler}
+            onChange={passwordChangedHandler}
+            onBlur={passwordBlurHandler}
           />
+        </div>
+        {passwordInputHasError && 
+          <p className={classes['error-text']}>Please enter the password.</p>}
         </div>
         <div className={classes.actions}>
           <Button type="submit" className={classes.btn} disabled={!formIsValid}>
