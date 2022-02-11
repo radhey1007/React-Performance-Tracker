@@ -82,7 +82,8 @@ const Register = (props) => {
         email:enteredEmail,
         password:enteredPassword,
         userType:userType,
-        role:1,
+        isBatchAssigned:false,
+        isTaskAssigned:false,
         adminCode:adminCode
       }
       resetNameInput();

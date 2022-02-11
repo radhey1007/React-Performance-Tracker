@@ -1,0 +1,62 @@
+export const COURSE_LIST = [
+    {
+        courseName:'React JS',
+        value:'react',
+        id:1
+    },
+    {
+        courseName:'Angular',
+        value:'angular',
+        id:2
+    },
+    {
+        courseName:'Node JS',
+        value:'nodejs',
+        id:3
+    },
+    {
+        courseName:'AWS',
+        value:'aws',
+        id:4
+    },
+    {
+        courseName:'Java',
+        value:'java',
+        id:5
+    },
+    {
+        courseName:'Vue JS',
+        value:'vue',
+        id:6
+    },
+    {
+        courseName:'Javascript',
+        value:'javascript',
+        id:7
+    },
+    {
+        courseName:'iOS',
+        value:'ios',
+        id:8 
+    },
+    {
+        courseName:'PHP',
+        value:'php',
+        id:9 
+    },
+    {
+        courseName:'MySql',
+        value:'mysql',
+        id:10 
+    },
+    {
+        courseName:'Asp.net',
+        value:'asp.net',
+        id:11 
+    },
+    {
+        courseName:'Salesforce',
+        courseName:'salesforce',
+        id:12 
+    }
+]

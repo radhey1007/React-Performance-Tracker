@@ -7,6 +7,7 @@ import Navbar from './Components/Navbar';
 import Login from './Components/Login/Login';
 import Register from './Components/Register/Register';
 import PageNotFound from './Components/PageNotFound';
+import Assignment from './Components/Assignment/Assignment';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/registration" element={<Register />}/>
         <Route path="/about" element={<About />}/>
         <Route path="/contact" element={<Contact />}/>
+        <Route path="/assignment" element={<Assignment />}/>
         <Route path="*" element={<PageNotFound />}/>
       </Routes>
     </div>
