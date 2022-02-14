@@ -18,7 +18,8 @@ const Dashboard = (props) => {
       </Grid>
       <Grid item xs={9}>
         <Paper>
-            <h3>Dashboard page</h3>            
+            <h3>Dashboard page</h3>  
+            <Outlet />              
         </Paper>
       </Grid>
     </Grid>

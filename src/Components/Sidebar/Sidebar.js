@@ -8,22 +8,27 @@ import { NavLink } from 'react-router-dom';
 
 const Sidebar = (props) => {
   return (  <div className={classes.sidebar}>
-                <NavLink className='link' to="/">
+                <NavLink className='sidelink' to="">
                   <SidebarLink text="Home" Icon={HomeIcon}/>
                 </NavLink>
-                <NavLink className='link' to="/student">
-                  <SidebarLink text="Student" Icon={HomeIcon}/>
+                <NavLink className='sidelink' to="/dashboard/student">
+                  <SidebarLink text="Student" Icon={PermIdentityIcon}/>
                 </NavLink>                
-                <SidebarLink text="Explore" Icon={SearchIcon} />
-                <NavLink className='link' to="/assignment">
-                <SidebarLink text="Assignment"/>
-              </NavLink> 
-                
-                <SidebarLink text="Batch" />
-                <SidebarLink text="Teacher" />
-                <SidebarLink text="Change Password" />
-                <SidebarLink text="Profile" Icon={PermIdentityIcon} />
-                <SidebarLink text="Logout" />
+                 <NavLink className='sidelink' to="/dashboard/assignment">
+                  <SidebarLink text="Assignment" Icon={HomeIcon}/>
+                </NavLink> 
+                <NavLink className='sidelink' to="/dashboard/batch">
+                  <SidebarLink text="Batch" Icon={HomeIcon}/>
+                </NavLink> 
+                <NavLink className='sidelink' to="/dashboard/teacher">
+                  <SidebarLink text="Teacher" Icon={PermIdentityIcon}/>
+                </NavLink>
+                <NavLink className='sidelink' to="/dashboard/profile">
+                  <SidebarLink text="Profile" Icon={PermIdentityIcon} />
+                </NavLink> 
+                <NavLink className='sidelink' to="/login">
+                   <SidebarLink text="Logout" Icon={HomeIcon}/>
+                </NavLink>               
             </div>
         );
 }

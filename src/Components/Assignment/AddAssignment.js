@@ -15,105 +15,61 @@ const AddAssignment = () => {
         reset:resetNameInput
       } = useInput(value => value.trim()!=='');
 
-const { value:enteredEmail, 
-        isValid:enteredEmailIsValid,
-        hasError: emailInputHasError,
-        valueChangeHandler:emailChangedHandler,
-        inputBlurHandler:emailBlurHandler,
-        reset:resetEmailInput
-      } = useInput(value => value.includes('@'));     
+const { value:enteredDescription, 
+        isValid:enteredDescriptionIsValid,
+        hasError: descriptionHasError,
+        valueChangeHandler:descriptionChangedHandler,
+        inputBlurHandler:descriptionBlurHandler,
+        reset:resetDescriptionInput
+      } = useInput(value => value.trim()!=='');     
       
- const { value:enteredContact, 
-        isValid:enteredContactIsValid,
-        hasError: contactInputHasError,
-        valueChangeHandler:contactChangedHandler,
-        inputBlurHandler:contactBlurHandler,
-        reset:resetContactInput
-      } = useInput(value => value!=='' && !isNaN(value) && value.length===10); 
-      
-  const { value:enteredPassword, 
-        isValid:enteredPasswordIsValid,
-        hasError: passwordInputHasError,
-        valueChangeHandler:passwordChangedHandler,
-        inputBlurHandler:passwordBlurHandler,
-        reset:resetPasswordInput
-      } = useInput(value => value!=='' && value.length > 3 && value.length < 8); 
-       
+        
 const [formIsValid, setFormIsValid] = useState(false);
-const [userType, setUserType] = useState('');
-const [userTypeIsValid, setUserTypeIsValid] = useState();
-const [isUserTypeTouched, setIsUserTypeTouched] = useState(false);
+const [course, setCourse] = useState('');
+const [courseIsValid, setCourseIsValid] = useState();
+const [isCourseTouched, setIsCourseTouched] = useState(false);
 
-const [adminCode, setAdmincode] = useState('');
-const [adminCodeIsValid, setAdminCodeIsValid] = useState();
-const [isAdminCodeTouched, setIsAdminCodeTouched] = useState(false);
 
-let userTypeList = ['','Student','Teacher','Admin']; 
 let courseList =  COURSE_LIST; 
 
 useEffect(()=> { 
   const identifier = setTimeout(() => {
     setFormIsValid(
-      enteredNameIsValid && enteredEmailIsValid && enteredContactIsValid &&
-      enteredPasswordIsValid && userTypeIsValid
+      enteredNameIsValid && enteredDescriptionIsValid && courseIsValid
     )
   },500);   
   return () => {
     clearTimeout(identifier);
   }    
-},[enteredNameIsValid,enteredEmailIsValid, enteredPasswordIsValid ,enteredContactIsValid , 
-  userTypeIsValid]);
+},[enteredNameIsValid,enteredDescriptionIsValid,courseIsValid]);
 
-const adminCodeChangeHandler = (event) => {
-  setAdmincode(event.target.value);
-};    
-
-const validateAdminHandler = () => {
-  setIsAdminCodeTouched(true);
-  setAdminCodeIsValid(adminCode==='ADMIN');
-};
-
-// 1 => Normal User
-// 2 => Admin User
 
 const submitHandler = (event) => {
   event.preventDefault();  
   const obj = {
-    name:enteredName,
-    contact:enteredContact,
-    email:enteredEmail,
-    password:enteredPassword,
-    userType:userType,
-    role:1,
-    adminCode:adminCode
+    assignment_name:enteredName,
+    assignment_description:enteredDescription
   }
   resetNameInput();
-  resetEmailInput();
-  resetContactInput();
-  resetPasswordInput();      
-  setUserType('');
-  setUserTypeIsValid(true);
+  resetDescriptionInput();
+  setCourse('');
+  setCourseIsValid(true);
   console.log(obj , 'obj');   
 };  
 
-const onChangeUserType = (event) => {
-  const userTypes = userTypeList[event.target.options.selectedIndex];
-  setUserTypeIsValid(userTypes.trim().length > 0);
-  setUserType(userTypes);
-  if(userType!=='Admin'){
-   setAdmincode('');
-  }
+const onChangeCourse = (event) => {
+  const courseData = courseList[event.target.options.selectedIndex-1];
+  setCourseIsValid(courseData && courseData.courseName.trim().length > 0);
+  setCourse(courseData);
 }
 
-const handleUserType = () => {
-  setIsUserTypeTouched(true);   
-  setUserTypeIsValid(userType.trim().length > 0);
+const handleCourse = () => {
+  setIsCourseTouched(true);   
+  setCourseIsValid(course && course.courseName.trim().length > 0);
 }
 
 const nameInputClasses = nameInputHasError ? `${classes['control']} ${classes.invalid}` : `${classes['control']}`;
-const contactInputClasses = contactInputHasError ? `${classes['control']} ${classes.invalid}` : `${classes['control']}`;
-
-
+const descriptionInputClasses = descriptionHasError ? `${classes['control']} ${classes.invalid}` : `${classes['control']}`;
 
 
   return (      
@@ -121,8 +77,8 @@ const contactInputClasses = contactInputHasError ? `${classes['control']} ${clas
     <form onSubmit={submitHandler}>
     <div>
     <div className={classes.control}>
-      <label htmlFor="userType">Select Course</label>
-      <select className={classes.select} value={userType} onBlur={handleUserType} onChange={onChangeUserType}>
+      <label htmlFor="course">Select Course</label>
+      <select className={classes.select} value={course ? course.id : ''} onBlur={handleCourse} onChange={onChangeCourse}>
         <option defaultValue="">Select Course </option>
          {
            courseList.map(course => (
@@ -131,7 +87,7 @@ const contactInputClasses = contactInputHasError ? `${classes['control']} ${clas
          }
       </select>
       </div>   
-      {isUserTypeTouched && !userTypeIsValid &&
+      {isCourseTouched && !courseIsValid &&
         <p className={classes['error-text']}>Please select the course.</p>}
   </div>
     <div className='form-input'>  
@@ -150,22 +106,22 @@ const contactInputClasses = contactInputHasError ? `${classes['control']} ${clas
        <p className={classes['error-text']}>Please enter the assignment name.</p>}
        </div>
        <div>
-     <div className={contactInputClasses}>
-     <label htmlFor="contact">Description</label>
+     <div className={descriptionInputClasses}>
+     <label htmlFor="description">Description</label>
      <input
          type="text"
-         id="contact"
-         value={enteredContact}
-         onChange={contactChangedHandler}
-         onBlur={contactBlurHandler}
+         id="description"
+         value={enteredDescription}
+         onChange={descriptionChangedHandler}
+         onBlur={descriptionBlurHandler}
      />
      </div>
-     {contactInputHasError && 
+     {descriptionHasError && 
        <p className={classes['error-text']}>Please enter the description.</p>}
      </div>              
      <div className={classes.actions}>
        <Button type="submit" className={classes.btn} disabled={!formIsValid}>
-         Register
+         SAVE
        </Button>
      </div>
    </form>

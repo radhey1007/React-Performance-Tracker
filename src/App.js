@@ -8,6 +8,11 @@ import Login from './Components/Login/Login';
 import Register from './Components/Register/Register';
 import PageNotFound from './Components/PageNotFound';
 import Assignment from './Components/Assignment/Assignment';
+import Dashboard from './Components/Dashboard/Dashboard';
+import Batch from './Components/Batch/Batch';
+import Student from './Components/Student/Student';
+import Teacher from './Components/Teacher/Teacher';
+import Profile from './Components/Profile/Profile';
 
 function App() {
   return (
@@ -21,6 +26,15 @@ function App() {
         <Route path="/contact" element={<Contact />}/>
         <Route path="/assignment" element={<Assignment />}/>
         <Route path="*" element={<PageNotFound />}/>
+
+        <Route path="dashboard" element={<Dashboard />}>
+          <Route path="student" element={<Student />} />          
+          <Route path="assignment" element={<Assignment />} />
+          <Route path="batch" element={<Batch />} />
+          <Route path="teacher" element={<Teacher />} />
+          <Route path="profile" element={<Profile />} />
+        </Route>
+
       </Routes>
     </div>
   );

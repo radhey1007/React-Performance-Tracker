@@ -3,6 +3,11 @@ import classes from './Register.module.css';
 import Button from '../../UI/Button/Button';
 import Card from '../../UI/Card/Card';
 import useInput from '../../hooks/use-input';
+import useHttp from '../../hooks/use-http';
+import { BASE_URL, USER_PATH } from '../../constant/urls';
+import Snackbar from '../../UI/Snackbar/Snackbar';
+import { useNavigate } from "react-router-dom";
+
 
 const Register = (props) => {
 
@@ -42,12 +47,14 @@ const Register = (props) => {
     const [userType, setUserType] = useState('');
     const [userTypeIsValid, setUserTypeIsValid] = useState();
     const [isUserTypeTouched, setIsUserTypeTouched] = useState(false);
-
     const [adminCode, setAdmincode] = useState('');
     const [adminCodeIsValid, setAdminCodeIsValid] = useState();
     const [isAdminCodeTouched, setIsAdminCodeTouched] = useState(false);
+    let userTypeList = ['','Student','Teacher','Admin']; 
+    const {isLoading , error , sendRequest:sendRegisterRequest} = useHttp();
+    const [isRegistrationSuccess , setIsRegistrationSuccess] = useState(false);
+    let navigate = useNavigate();
 
-    let userTypeList = ['','Student','Teacher','Admin'];   
 
     useEffect(()=> { 
       const identifier = setTimeout(() => {
@@ -73,6 +80,24 @@ const Register = (props) => {
 
     // 1 => Normal User
     // 2 => Admin User
+
+    const registerUser = (data) => {
+      console.log(data , 'in register');
+      if(data){
+        setIsRegistrationSuccess(true);
+        resetNameInput();
+        resetEmailInput();
+        resetContactInput();
+        resetPasswordInput();      
+        setUserType('');
+        setUserTypeIsValid(true);
+        //hide message after 3 sec and redirect to login page
+        setTimeout(() => {
+          setIsRegistrationSuccess(false);
+          return navigate("/login");      
+        },2000);
+      }
+    }
   
     const submitHandler = (event) => {
       event.preventDefault();  
@@ -84,17 +109,21 @@ const Register = (props) => {
         userType:userType,
         isBatchAssigned:false,
         isTaskAssigned:false,
+        isSoftDelete:false,
         adminCode:adminCode
       }
-      resetNameInput();
-      resetEmailInput();
-      resetContactInput();
-      resetPasswordInput();      
-      setUserType('');
-      setUserTypeIsValid(true);
-      console.log(obj , 'obj');   
-    };  
 
+      const requestConfig = {
+        url:BASE_URL + USER_PATH,
+        method: 'POST',
+        body: JSON.stringify(obj),
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      }
+      sendRegisterRequest(requestConfig , registerUser.bind(null));  
+    };  
+    
     const onChangeUserType = (event) => {
       const userTypes = userTypeList[event.target.options.selectedIndex];
       setUserTypeIsValid(userTypes.trim().length > 0);
@@ -210,6 +239,9 @@ const Register = (props) => {
       </Button>
     </div>
   </form>
+
+     {isRegistrationSuccess && !error && <Snackbar severity="success-msg">Registration successful.</Snackbar> }   
+
 </Card>;
 }
 
