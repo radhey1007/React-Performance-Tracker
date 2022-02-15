@@ -48,3 +48,11 @@
   left: 40px;
   right:40px;
 }
+.loading {
+  display:flex;
+  font-size:20px;
+  text-align:center;
+  position:relative;
+  top:25px;
+  justify-content: center;
+}

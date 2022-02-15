@@ -1,5 +1,5 @@
 import React , { useState , useEffect } from 'react';
-import classes from './Register.module.css';
+import classes from '../Register/Register.module.css';
 import Button from '../../UI/Button/Button';
 import Card from '../../UI/Card/Card';
 import useInput from '../../hooks/use-input';
@@ -9,7 +9,7 @@ import Snackbar from '../../UI/Snackbar/Snackbar';
 import { useNavigate } from "react-router-dom";
 
 
-const Register = (props) => {
+const EditUser = (props) => {
 
     const loginUserDetail = JSON.parse(localStorage.getItem('loginUserdetails')) || {};
     const editFormData = props.editFormData;
@@ -52,7 +52,7 @@ const Register = (props) => {
     }
     
 
-    const { value:enteredName, 
+    let { value:enteredName, 
             isValid:enteredNameIsValid,
             hasError: nameInputHasError,
             valueChangeHandler:nameChangedHandler,
@@ -95,9 +95,9 @@ const Register = (props) => {
     const {isLoading , error , sendRequest:sendRegisterRequest} = useHttp();
     const [isRegistrationSuccess , setIsRegistrationSuccess] = useState(false);
     const [registerError, setRegisterError] = useState('');
-
     let navigate = useNavigate();
 
+  
 
     useEffect(()=> { 
       const identifier = setTimeout(() => {
@@ -195,6 +195,7 @@ const Register = (props) => {
    
 
   return <Card className={classes.register}>
+  <h2>Edit User</h2>
   <form onSubmit={submitHandler}>
    <div className='form-input'>  
    <div className={nameInputClasses}>
@@ -296,4 +297,4 @@ const Register = (props) => {
 </Card>;
 }
 
-export default Register;
+export default EditUser;

@@ -1,38 +1,38 @@
 import React, {useState , useEffect}  from 'react';
 import useHttp from '../../hooks/use-http';
-import { BASE_URL,ASSIGNMENT_PATH } from '../../constant/urls';
+import { BASE_URL, BATCH_PATH } from '../../constant/urls';
 import MaterialTable from 'material-table';
+import Wrapper from '../../helper/Wrapper';
 
 
-const AssignmentList = () => {
+const BatchList = () => {
 
   const loginUserDetail = JSON.parse(localStorage.getItem('loginUserdetails'));
-  const [assignmentList, setAssignmentList] = useState([]);
+  const [batchList, setBatchList] = useState([]);
   const {isLoading , error , sendRequest:getData} = useHttp();
-  const {isLoading:isAssignmentLoading , error:assignmentError , sendRequest:deleteAssignment} = useHttp();
+
+  const {isLoading:isBatchLoading , error:batchError , sendRequest:deleteBatch} = useHttp();
 
   const columns = [
-    { title: 'Assignment Name', field: 'assignmentName' },   
     { title: 'Batch Name', field: 'batchName' },
+    { title: 'Status', field: 'isBatchActive' },
     { title: 'Course Name', field: 'courseName' },
     { title: 'Start Date', field: 'startDate' },
-    {title: 'End Date', field: 'endDate'},
-    { title: 'Progress Status', field: 'assignmentStatus' },
-    { title: 'Active Status', field: 'isAssignmentActive' },
+    {title: 'End Date', field: 'endDate'}
   ]
 
-  const handleRecord  = (assignmentListResponse) => {
-    console.log(assignmentListResponse)
-      if(assignmentListResponse.status){
-        setAssignmentList(assignmentListResponse.response);
+  const handleRecord  = (batchListResponse) => {
+    console.log(batchListResponse)
+      if(batchListResponse.status){
+        setBatchList(batchListResponse.response);
       } else {
-        setAssignmentList([]);
+        setBatchList([]);
       }
   }
 
-  const getAssignmentList = () => {   
+  const getBatchList = () => {   
     const requestConfig = {
-      url:BASE_URL + '/assignment',
+      url:BASE_URL + '/batch',
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -42,37 +42,36 @@ const AssignmentList = () => {
   }
 
   useEffect(() => {
-    getAssignmentList();
+    getBatchList();
   },[]);
   
   const handleEdit = (id) => {
     console.log(id);
   } 
 
-
   const handleRemove = (deleteResponse) => {
     if(deleteResponse.status){
       alert('Record Deleted Successfully');      
-      getAssignmentList();
+      getBatchList();
     }
   }
 
   const handleDelete = (id) => {
     const requestConfig = {
-      url:BASE_URL + ASSIGNMENT_PATH + '/'+ id,
+      url:BASE_URL + BATCH_PATH + '/'+ id,
       method: 'DELETE',
       headers: {
         'Authorization': 'Bearer ' + localStorage.getItem('token')
       }
     }
-    deleteAssignment(requestConfig , handleRemove.bind(null)); 
+    deleteBatch(requestConfig , handleRemove.bind(null)); 
   } 
 
   const action = [
     {
       icon: 'edit',
       tooltip: 'Edit Assignment',
-      onClick: (event, rowData) => handleEdit(rowData._id)
+      onClick: (event, rowData) => handleDelete(rowData._id)
     },
     rowData => ({
       icon: 'delete',
@@ -80,20 +79,18 @@ const AssignmentList = () => {
       onClick: (event, rowData) => handleDelete(rowData._id)
     })
   ];
-
-
  
-  return <div> 
+  return <Wrapper> 
   {isLoading && <h2 className="loading">Loading...</h2>}
-  {assignmentList.length > 0 && <MaterialTable
-    title="Assignment List"
+  {batchList.length > 0 && <MaterialTable
+    title="Batch List"
     columns={columns}
-    data={assignmentList}
+    data={batchList}
     actions={ action}
     // options={
     // }
-    /> }</div>
+    /> }</Wrapper>
     ;
 }
 
-export default AssignmentList;
+export default BatchList;

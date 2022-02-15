@@ -29,27 +29,19 @@ const inputStateReducer = (state,action) => {
 
 const useInput = (validateValue) => {
     let [inputState , dispatch] = useReducer(inputStateReducer ,  initailInputState);
-
-    // const [enteredValue, setEnteredValue] = useState('');
-    // const [isTouched, setIsTouched] = useState(false); 
-
     const valueIsValid = validateValue(inputState.value);
     const hasError = !valueIsValid && inputState.isTouched;
 
     const valueChangeHandler = (event) => {
         dispatch({type:'INPUT', value:event.target.value});
-        // setEnteredValue(event.target.value);   
     };
 
     const inputBlurHandler = () => {
-        // setIsTouched(true);
         dispatch({type:'BLUR'});
     };
 
     const reset = () => {
-        dispatch({type:'RESET'});
-        // setEnteredValue('');
-        // setIsTouched(false); 
+        dispatch({type:'RESET'});        
     }
 
   return {

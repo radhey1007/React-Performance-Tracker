@@ -1,17 +1,17 @@
 import React , { useState , useEffect } from 'react';
-import classes from './AddAssignment.module.css';
+import classes from './AddBatch.module.css';
 import Button from '../../UI/Button/Button';
 import Card from '../../UI/Card/Card';
 import useInput from '../../hooks/use-input';
 import { COURSE_LIST } from '../../constant/course';
 import useHttp from '../../hooks/use-http';
-import { BASE_URL,ASSIGNMENT_PATH } from '../../constant/urls';
+import { BASE_URL,BATCH_PATH } from '../../constant/urls';
 import { useNavigate } from "react-router-dom";
 import Snackbar from '../../UI/Snackbar/Snackbar';
 
 
 
-const AddAssignment = (props) => {
+const AddBatch = (props) => {
 
   const loginUserDetail = JSON.parse(localStorage.getItem('loginUserdetails'));
     const { value:enteredName, 
@@ -52,41 +52,9 @@ const [formIsValid, setFormIsValid] = useState(false);
 const [course, setCourse] = useState('');
 const [courseIsValid, setCourseIsValid] = useState();
 const [isCourseTouched, setIsCourseTouched] = useState(false);
-const [batchList, setBatchList] = useState([]);
-
-const [batch, setBatch] = useState('');
-const [batchIsValid, setBatchIsValid] = useState();
-const [isBatchTouched, setIsBatchTouched] = useState(false);
-const {isLoading , error , sendRequest:getData} = useHttp();
 const {isLoading:addLoading , error:addError , sendRequest:addRequest} = useHttp();
 let navigate = useNavigate();
-const [isAddAssignmentError, setIsAddAssignmentError] = useState('');
-
-
-const handleBatchList  = (batchListResponse) => {
-  console.log(batchListResponse);
-    if(batchListResponse.status){
-      setBatchList(batchListResponse.response);
-    } else {
-      setBatchList([]);
-    }
-}
-
-
-const getBatchByCourseId = (courseId) => {  
-  const obj = {
-    courseId : courseId
-  } 
-  const requestConfig = {
-    url:BASE_URL + '/batch/getBatchByCourseID',
-    method: 'POST',
-    body: JSON.stringify(obj),
-    headers: {
-      'Content-Type': 'application/json',
-    }
-  }
-  getData(requestConfig , handleBatchList.bind(null)); 
-}
+const [isAddrror, setIsAddrror] = useState('');
 
 
 let courseList =  COURSE_LIST; 
@@ -95,33 +63,31 @@ useEffect(()=> {
   const identifier = setTimeout(() => {
     setFormIsValid(
       enteredNameIsValid && enteredDescriptionIsValid && courseIsValid && 
-      batchIsValid && enteredStartDateIsValid && enteredEndDateIsValid
+        enteredStartDateIsValid && enteredEndDateIsValid
     )
   },500);   
   return () => {
     clearTimeout(identifier);
   }    
 },[enteredNameIsValid,enteredDescriptionIsValid,courseIsValid,
-  batchIsValid, enteredStartDateIsValid,enteredEndDateIsValid]);
+  enteredStartDateIsValid,enteredEndDateIsValid]);
 
-const addAssignmentsData = (assignmentAddResponse) => {
-  if(assignmentAddResponse.status){
+const addBatchData = (batchAddResponse) => {
+  if(batchAddResponse.status){
     resetNameInput();
     resetDescriptionInput();
     setCourse('');
     setCourseIsValid(true);
-    setBatch('');
-    setBatchIsValid(true);
     resetStartDateInput();
     resetEndDateInput();
-    alert('Assignment added successfully');
-    setIsAddAssignmentError('');
+    alert('Batch added successfully');
+    setIsAddrror('');
     props.showForm(false);   // set view mode to list
-    return navigate("/dashboard/assignment"); 
+    return navigate("/dashboard/batch"); 
   } else {
-    setIsAddAssignmentError(assignmentAddResponse.message);
+    setIsAddrror(batchAddResponse.message);
         setTimeout(()=> {
-          setIsAddAssignmentError('');
+          setIsAddrror('');
         },4000);
   }
 
@@ -131,23 +97,19 @@ const addAssignmentsData = (assignmentAddResponse) => {
 const submitHandler = (event) => {
   event.preventDefault();  
   const obj = {
-    assignmentName:enteredName,
     description:enteredDescription,
     userType:loginUserDetail ? loginUserDetail.userType : 'Admin',
-    isBatchActive:true,
+    isBatchActive:false,
     startDate: enteredStartDate,
     endDate: enteredEndDate,
-    isAssignmentActive:false,
     userId: loginUserDetail ? loginUserDetail._id : '',
     courseName: course.courseName,
     courseId: course.id,
-    batchName: batch.batchName,
-    batchId: batch._id,
-    assignmentStatus:"Initial"
+    batchName: enteredName
   }
 
   const requestConfig = {
-    url:BASE_URL + ASSIGNMENT_PATH,
+    url:BASE_URL + BATCH_PATH,
     method: 'POST',
     body: JSON.stringify(obj),
     headers: {      
@@ -155,34 +117,19 @@ const submitHandler = (event) => {
       'Content-Type': 'application/json',
     }
   }
-  addRequest(requestConfig , addAssignmentsData.bind(null));   
+  addRequest(requestConfig , addBatchData.bind(null));   
 };  
 
 const onChangeCourse = (event) => {
   const courseData = courseList[event.target.options.selectedIndex-1];  
   setCourseIsValid(courseData && courseData.courseName.trim().length > 0);
-  setCourse(courseData);
-  if(courseData && courseData.id){
-    getBatchByCourseId(courseData.id);
-  }
+  setCourse(courseData);  
 }
 
 const handleCourse = () => {
   setIsCourseTouched(true);   
   setCourseIsValid(course && course.courseName.trim().length > 0);
 }
-
-const onChangeBatch = (event) => {
-  const batchData = batchList[event.target.options.selectedIndex-1];  
-  setBatchIsValid(batchData && batchData.batchName.trim().length > 0);
-  setBatch(batchData);  
-}
-
-const handleBatch = () => {
-  setIsBatchTouched(true);   
-  setBatchIsValid(batch && batch.batchName.trim().length > 0);
-}
-
 
 const nameInputClasses = nameInputHasError ? `${classes['control']} ${classes.invalid}` : `${classes['control']}`;
 const descriptionInputClasses = descriptionHasError ? `${classes['control']} ${classes.invalid}` : `${classes['control']}`;
@@ -208,26 +155,9 @@ const endDateInputClasses = endDateInputHasError ? `${classes['control']} ${clas
       {isCourseTouched && !courseIsValid &&
         <p className={classes['error-text']}>Please select the course.</p>}
   </div>
-
-  <div>
-  <div className={classes.control}>
-    <label htmlFor="batch">Select Batch</label>
-    <select className={classes.select} value={batch ? batch._id : ''} onBlur={handleBatch} onChange={onChangeBatch}>
-      <option defaultValue="">Select Batch </option>
-       {
-         batchList.map(batch => (
-           <option key={batch._id} value={batch._id}>{batch.batchName}</option>
-         ))
-       }
-    </select>
-    </div>   
-    {isBatchTouched && !batchIsValid &&
-      <p className={classes['error-text']}>Please select the batch.</p>}
-  </div>   
-
     <div className='form-input'>  
     <div className={nameInputClasses}>
-     <label htmlFor="name">Assignment Name</label>
+     <label htmlFor="name">Batch Name</label>
      <input
          type="text"
          id="name"
@@ -238,7 +168,7 @@ const endDateInputClasses = endDateInputHasError ? `${classes['control']} ${clas
      
      </div>
      {nameInputHasError && 
-       <p className={classes['error-text']}>Please enter the assignment name.</p>}
+       <p className={classes['error-text']}>Please enter the batch name.</p>}
        </div>
        <div>
      <div className={descriptionInputClasses}>
@@ -269,7 +199,7 @@ const endDateInputClasses = endDateInputHasError ? `${classes['control']} ${clas
      
      </div>
         {startDateInputHasError && 
-       <p className={classes['error-text']}>Please enter the assignment Start Date.</p>}
+       <p className={classes['error-text']}>Please enter the batch Start Date.</p>}
        </div>
 
        <div className='form-input'>  
@@ -285,7 +215,7 @@ const endDateInputClasses = endDateInputHasError ? `${classes['control']} ${clas
         
         </div>
            {endDateInputHasError && 
-          <p className={classes['error-text']}>Please enter the assignment End Date.</p>}
+          <p className={classes['error-text']}>Please enter the batch End Date.</p>}
         </div>
 
      <div className={classes.actions}>
@@ -294,9 +224,9 @@ const endDateInputClasses = endDateInputHasError ? `${classes['control']} ${clas
        </Button>
      </div>
    </form>
-   {isAddAssignmentError && <Snackbar severity="error-msg">{isAddAssignmentError}</Snackbar> }
+   {isAddrror && <Snackbar severity="error-msg">{isAddrror}</Snackbar> }
     </Card>
   )
 }
 
-export default AddAssignment
+export default AddBatch

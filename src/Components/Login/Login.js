@@ -1,12 +1,16 @@
 import  { useState , useEffect } from 'react';
-
 import Card from '../../UI/Card/Card';
 import Button from '../../UI/Button/Button';
 import classes from './Login.module.css';
 import useInput from '../../hooks/use-input';
+import useHttp from '../../hooks/use-http';
+import { useNavigate } from "react-router-dom";
+import { BASE_URL, LOGIN_PATH } from '../../constant/urls';
+import Snackbar from '../../UI/Snackbar/Snackbar';
 
 const Login = (props) => {
   const [formIsValid, setFormIsValid] = useState(false);
+  const [isLoginError, setIsLoginError] = useState(false);
 
   const { value:enteredEmail, 
     isValid:enteredEmailIsValid,
@@ -24,6 +28,9 @@ const Login = (props) => {
     reset:resetPasswordInput
   } = useInput(value => value!=='' && value.length > 3 && value.length < 8);
 
+  const {isLoading , error , sendRequest:sendLoginRequest} = useHttp();
+  let navigate = useNavigate();
+
   useEffect(()=> {
     const identifier = setTimeout(()=> {
       setFormIsValid(
@@ -36,13 +43,38 @@ const Login = (props) => {
     }    
   },[enteredEmailIsValid,enteredPasswordIsValid])
 
+
+  const handleLogin = (loginResponse) => {
+    if(loginResponse && loginResponse.token){
+      localStorage.setItem('token', loginResponse.token);
+      localStorage.setItem('loginUserdetails', JSON.stringify(loginResponse.response[0]));
+      setIsLoginError(false);
+      return navigate("/home");
+    }
+    if(!loginResponse.status){
+        setIsLoginError(true);
+        setTimeout(()=> {
+          setIsLoginError(false);
+        },2000);
+    } 
+  }
+
   const submitHandler = (event) => {
     event.preventDefault();
     let obj = {
       email:enteredEmail,
       password:enteredPassword
     }
-    console.log(obj);       
+    console.log(obj);
+    const requestConfig = {
+      url:BASE_URL + LOGIN_PATH,
+      method: 'POST',
+      body: JSON.stringify(obj),
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    }
+    sendLoginRequest(requestConfig , handleLogin.bind(null));         
   };
 
   const emailInputClasses = emailInputHasError ? `${classes['control']} ${classes.invalid}` : `${classes['control']}`;
@@ -86,6 +118,9 @@ const Login = (props) => {
           </Button>
         </div>
       </form>
+
+      {isLoginError && <Snackbar severity="error-msg">Invalid Email or Password !</Snackbar> }   
+
     </Card>
   );
 };
